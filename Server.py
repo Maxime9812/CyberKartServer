@@ -22,6 +22,8 @@ class Server:
         print("Server stoped")
 
     def searchClient(self):
+        print("Search new client")
+        self.client = None
         while self.client is None:
             newClient, address = self.socket.accept()
             self.client = newClient
