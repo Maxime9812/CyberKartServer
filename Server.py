@@ -1,26 +1,28 @@
 import socket
 
-port = 8888
-isRunning = False;
-
-def start():
-    server = socket.socket()
-    server.bind(('',port))
-
-    print("Starting Server on port",port)
-
-    server.listen(5)
-    print("Server listening")
+class Server:
+    def __init__(self, port, maxConnection):
+      self.port = port
+      self.maxConnection = maxConnection
+      self.client = None
     
-    isRunning = True
-    
-    while isRunning:
-        client, address = server.accept()
-        print("New connection from",address)
-        client.close()
+    def start(self):
+        self.socket = socket.socket()
+        self.socket.bind(('',self.port))
 
-def stop():
-    isRunning = False
-    print("Server stoped")
+        print("Starting Server on port",self.port)
 
-start()
+        self.socket.listen(self.maxConnection)
+        print("Server listening")
+        
+        self.isRunning = True
+
+    def stop(self):
+        self.isRunning = False
+        print("Server stoped")
+
+    def searchClient(self):
+        while self.client is None:
+            newClient, address = self.socket.accept()
+            self.client = newClient
+            print("New connection from",address)
