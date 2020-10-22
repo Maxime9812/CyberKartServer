@@ -1,6 +1,6 @@
 from Direction import Direction
 
-class kart:
+class Kart:
     def __init__(self):
         self.direction = Direction()
     

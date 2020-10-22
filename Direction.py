@@ -3,12 +3,13 @@ import RPi.GPIO as GPIO
 class Direction:
     def __init__(self):
         GPIO.setmode(GPIO.BOARD) # Use board numerotation mode
-        GPIO.setWarning(False) # Disable warning
-    
-        GPIO.setup(pwm_gpio,GPIO.OUT)
+        GPIO.setwarnings(False) # Disable warning
         
         self.pin = 12
         self.frequence = 50
+        
+        GPIO.setup(self.pin,GPIO.OUT)
+        
         self.pwm = GPIO.PWM(self.pin,self.frequence)
         
         self.resetPosition()
@@ -16,9 +17,9 @@ class Direction:
     def resetPosition(self):
         self.changeRotation(angle_to_percent(80))
     
-    def changeRotation(angle):
+    def changeRotation(self, angle):
         self.rotation = angle_to_percent(angle)
-        pwm.start(self.rotation)
+        self.pwm.start(self.rotation)
  
  
 def angle_to_percent(angle):
