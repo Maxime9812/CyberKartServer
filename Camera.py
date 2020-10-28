@@ -2,7 +2,6 @@ import threading
 import time
 import picamera
 import io
-from Server import *
 
 threadLock = threading.Lock()
 
@@ -24,9 +23,10 @@ class StreamingOutput(object):
 
 
 class Camera:
-    def __init__(self):
+    def __init__(self, onFrameRead):
         self.thread = threading.Thread(target=self.Send, args=())
         self.isRunning = False
+        self.onFrameRead = onFrameRead
 
     def start(self):
         print("Start Camera")
@@ -38,29 +38,13 @@ class Camera:
         self.isRunning = False
 
     def Send(self):
-        while self.isRunning:
-            if Server._instance.client is not None:
-                try:
+        with picamera.PiCamera(resolution='640x480', framerate=30) as camera:
+            output = StreamingOutput()
 
-                    with picamera.PiCamera(resolution='640x480', framerate=30) as camera:
-                        output = StreamingOutput()
+            camera.start_recording(output, format='mjpeg')
 
-                        camera.start_recording(output, format='mjpeg')
-                        while Server._instance.client is not None:
-                            with output.condition:
-                                output.condition.wait()
-                                frame = output.frame
-                                packet = io.BytesIO()
-                                packetToSend = io.BytesIO()
-
-                                packet.write(struct.pack('i', 2))
-                                packet.write(struct.pack('i', len(frame)))
-                                packet.write(frame)
-
-                                packetToSend.write(struct.pack('i', len(packet.getvalue())))
-                                packetToSend.write(packet.getvalue())
-
-                                print(Server._instance.client.send(packetToSend.getvalue()))
-
-                except socket.timeout:
-                    Server._instance.client = None
+            while self.isRunning:
+                with output.condition:
+                    output.condition.wait()
+                    frame = output.frame
+                    self.onFrameRead(frame)

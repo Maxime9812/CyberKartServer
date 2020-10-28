@@ -1,14 +1,16 @@
 import socket
 from Client import *
+import io
 
 
 class Server:
     _instance = None
 
-    def __init__(self, port):
+    def __init__(self, port, onPacketReceived):
         if Server._instance is None:
             Server._instance = self
 
+        self.onPacketReceived = onPacketReceived
         self.port = port
         self.maxConnection = 1
         self.client = None
@@ -37,7 +39,7 @@ class Server:
         self.client = None
         while self.client is None:
             newClient, address = self.socket.accept()
-            self.client = Client(newClient, self.onClientDisconnected)
+            self.client = Client(newClient, self.onClientDisconnected, self.onPacketReceived)
             print("New connection from", address)
 
     def onClientDisconnected(self):

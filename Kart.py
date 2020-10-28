@@ -6,13 +6,14 @@ from Camera import Camera
 class Kart:
     _instance = None
 
-    def __init__(self):
+    def __init__(self, onCameraRead):
         if Kart._instance is None:
             Kart._instance = self
 
         self.direction = Direction()
         self.motor = Motor()
-        self.Camera = Camera()
+        self.camera = Camera(onCameraRead)
+        self.camera.start()
 
     def turn(self, angle):
         self.direction.changeRotation(angle)

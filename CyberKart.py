@@ -3,19 +3,22 @@ from ServerSend import *
 from ClientHandle import *
 from Kart import *
 
-# Initialize Server
-server = Server(8888)
-ServerSend()
 ClientHandle()
+ServerSend()
 
-server.start()
+packetHandle = {2: ClientHandle._instance.change_direction}
+
+
+def handlerClient(idPacket, packet):
+    packetHandle[idPacket](packet)
+
+
+def OnCameraRead(frame):
+    ServerSend._instance.SendCameraData(frame)
 
 # Initialize Kart
-kart = Kart()
+kart = Kart(OnCameraRead)
 
-
-
-
-
-
-
+# Initialize Server
+server = Server(8889, handlerClient)
+server.start()
